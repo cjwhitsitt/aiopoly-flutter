@@ -1,6 +1,14 @@
+import 'package:aiopoly/firebase_options.dart';
+import 'package:aiopoly/result_route.dart';
+import 'package:aiopoly/service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -33,6 +41,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final controller = TextEditingController();
+  final service = Service();
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: TextField(
                   controller: controller,
+                  onSubmitted: (_) => _submit(),
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () => _submit(),
                 icon: const Icon(Icons.arrow_forward),
               ),
             ]),
@@ -75,5 +85,14 @@ class _MyHomePageState extends State<MyHomePage> {
         children: children,
       ),
     );
+  }
+
+  void _submit() async {
+    var result = await service.create(controller.text);
+    if (result) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return const ResultRoute();
+      }));
+    }
   }
 }
