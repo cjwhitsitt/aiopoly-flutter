@@ -2,7 +2,7 @@
 
 This project demonstrates how to leverage Vertex AI's text generation capabilities within a Flutter app to create unique Monopoly properties based on user-provided themes. 
 
-This Flutter app is meant to work in conjunction with the Functions repo, which actually makes the call to the Vertex APIs.
+This Flutter app is meant to work in conjunction with the Functions repo, which actually makes the call to the Vertex APIs. https://github.com/cjwhitsitt/aiopoly-functions
 
 ## Key Features:
 
@@ -20,10 +20,12 @@ This Flutter app is meant to work in conjunction with the Functions repo, which 
 ## Getting Started:
 
 1. **Setup the Functions project**
+
    https://github.com/cjwhitsitt/aiopoly-functions
+
    This will also setup the Google Cloud and Firebase project needed for this sample.
 
-2. **Install Flutterfire**
+3. **Install Flutterfire**
    ```bash
    dart pub global activate flutterfire_cli
    ```
@@ -41,6 +43,7 @@ This Flutter app is meant to work in conjunction with the Functions repo, which 
    ```
 
 6. **Connect to Functions**
+
    If using deployed Functions and not a local emulator, comment out this line:
    ```dart
    Future<void> main() async {
@@ -55,7 +58,7 @@ This Flutter app is meant to work in conjunction with the Functions repo, which 
    }
    ```
 
-7. **Run the app:**
+8. **Run the app:**
    ```bash
    flutter run
    ```
