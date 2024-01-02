@@ -1,4 +1,4 @@
-# AIopoly
+# AIopoly - Flutter
 
 This project demonstrates how to leverage Vertex AI's text generation capabilities within a Flutter app to create unique Monopoly properties based on user-provided themes. 
 
