@@ -7,7 +7,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 
 class Service {
-  static void initialize() {
+  static void useEmulators() {
     if (kDebugMode) {
       String host = Platform.isAndroid ? "10.0.2.2" : "localhost";
       print('Running in debug. Host connecting to emulator at $host.');
