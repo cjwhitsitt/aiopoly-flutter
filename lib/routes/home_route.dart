@@ -1,4 +1,3 @@
-import 'package:aiopoly/data/property_group.dart';
 import 'package:aiopoly/routes/result_route.dart';
 import 'package:aiopoly/data/service.dart';
 import 'package:flutter/foundation.dart';
@@ -31,6 +30,7 @@ class _HomeRouteState extends State<HomeRoute> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            const Spacer(flex: 2),
             _row([
               const Text(
                 'Enter a theme for your game',
@@ -45,17 +45,29 @@ class _HomeRouteState extends State<HomeRoute> {
                   onChanged: (value) => setState(() {
                     _canSubmit = value.isNotEmpty;
                   }),
-                  onSubmitted: (_) => _submit(),
+                  textAlign: TextAlign.center,
                 ),
               ),
-              const SizedBox(width: 12),
-              _loading
-                ? const CircularProgressIndicator.adaptive()
-                : IconButton(
-                  onPressed: _canSubmit ? () => _submit() : null,
-                  icon: const Icon(Icons.arrow_forward),
-                ),
             ]),
+            const Spacer(),
+            if (_loading) _row([const CircularProgressIndicator.adaptive()]),
+            if (!_loading) _row([
+              const Text('Choose how to submit'),
+            ]),
+            if (!_loading) _row([
+              const Spacer(),
+              TextButton(
+                onPressed: _canSubmit ? () => _submit(ServiceEndpoint.firebase) : null,
+                child: const Text('Via Firebase'),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: _canSubmit ? () => _submit(ServiceEndpoint.direct) : null,
+                child: const Text('Direct to Vertex AI'),
+              ),
+              const Spacer(),
+            ]),
+            const Spacer(flex: 2),
           ],
         ),
       ),
@@ -72,13 +84,13 @@ class _HomeRouteState extends State<HomeRoute> {
     );
   }
 
-  void _submit() {
+  void _submit(ServiceEndpoint endpoint) {
     setState(() {
       _loading = true;
     });
     var theme = _controller.text;
 
-    _service.create(theme).then((value) {
+    _service.create(theme, endpoint: endpoint).then((value) {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return ResultRoute(theme: theme, propertyGroups: value);
       }));
@@ -86,6 +98,18 @@ class _HomeRouteState extends State<HomeRoute> {
       if (kDebugMode) {
         print(error);
       }
+      showAdaptiveDialog(context: context, builder: (context) {
+        return AlertDialog.adaptive(
+          title: const Text('Error'),
+          content: Text(error.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      });
     }).whenComplete(() {
       setState(() {
         _loading = false;

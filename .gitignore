@@ -50,3 +50,4 @@ ios/firebase_app_id_file.json
 lib/firebase_options.dart
 
 .nvmrc
+.envrc
