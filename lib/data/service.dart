@@ -73,7 +73,7 @@ class Service {
       "groups": [
         {
           "color": "dark blue",
-          "hex": "#295DAB,
+          "hex": "#295DAB",
           "properties": [
             {
               "name": "Boardwalk",
