@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.9.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,11 +36,11 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # When using Firebase to retrieve responses
-  firebase_core: ^2.24.2
-  cloud_functions: ^4.5.8
+  firebase_core: ^4.2.1
+  cloud_functions: ^6.0.4
 
   # When making direct calls to Gemini
-  google_generative_ai: ^0.2.0
+  firebase_ai: ^3.6.0
 
 dev_dependencies:
   flutter_test:

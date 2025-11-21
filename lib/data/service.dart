@@ -5,8 +5,8 @@ import 'package:aiopoly/utils/constants.dart';
 import 'package:aiopoly/data/create_response.dart';
 import 'package:aiopoly/data/property_group.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 
 enum ServiceEndpoint {
   firebase, direct
@@ -47,17 +47,17 @@ class Service {
   }
 
   Future<CreateResponse> _makeDirectRequest(String theme) async {
-    const apiKey = String.fromEnvironment('AI_API_KEY');
-    if (apiKey.isEmpty) {
-      throw('No API key set as dart environment variable');
-    }
+    // Initialize the Gemini Developer API backend service
+    // Create a `GenerativeModel` instance with a model that supports your use case
+    final model = FirebaseAI.googleAI().generativeModel(model: 'gemini-2.5-flash-lite');
+    
+    // Provide a prompt that contains text
+    final prompt = [Content.text(_aiPrompt(theme))];
 
-    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
-    final content = await model.generateContent([
-      Content.text(_aiPrompt(theme))
-    ]);
+    // To generate text output, call generateContent with the text input
+    final response = await model.generateContent(prompt);
 
-    final text = content.text;
+    final text = response.text;
     if (text != null) {
       dLog('Response:');
       dLog(text);

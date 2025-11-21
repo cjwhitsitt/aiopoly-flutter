@@ -63,7 +63,7 @@ class _HomeRouteState extends State<HomeRoute> {
               const Spacer(),
               TextButton(
                 onPressed: _canSubmit ? () => _submit(ServiceEndpoint.direct) : null,
-                child: const Text('Direct to Vertex AI'),
+                child: const Text('Direct'),
               ),
               const Spacer(),
             ]),
