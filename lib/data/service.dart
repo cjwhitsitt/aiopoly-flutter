@@ -49,10 +49,34 @@ class Service {
   Future<CreateResponse> _makeDirectRequest(String theme) async {
     // Initialize the Gemini Developer API backend service
     // Create a `GenerativeModel` instance with a model that supports your use case
-    final model = FirebaseAI.googleAI().generativeModel(model: 'gemini-2.5-flash-lite');
-    
+    final model = FirebaseAI.googleAI().generativeModel(
+      model: 'gemini-2.5-flash-lite',
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema(
+          SchemaType.object,
+          properties: {
+            'groups': Schema(SchemaType.array, items: Schema(
+              SchemaType.object,
+              properties: {
+                'color': Schema(SchemaType.string, description: 'Color of the property group, for example: "Dark Blue"'),
+                'hex': Schema(SchemaType.string, description: 'Hex code of the color, for example: "#295DAB"'),
+                'properties': Schema(SchemaType.array, items: Schema(
+                  SchemaType.object,
+                  properties: {
+                    'name': Schema(SchemaType.string, description: 'Name of the property, for example: "Park Place"'),
+                    'rent': Schema(SchemaType.integer, description: 'Rent price of the property, for example: 350'),
+                  },
+                )),
+              },
+            )),
+          },
+        ),
+      ),
+    );
+
     // Provide a prompt that contains text
-    final prompt = [Content.text(_aiPrompt(theme))];
+    final prompt = [Content.text('Provide Monopoly board spaces for a game themed around $theme')];
 
     // To generate text output, call generateContent with the text input
     final response = await model.generateContent(prompt);
@@ -64,25 +88,5 @@ class Service {
       return CreateResponse.fromJson(jsonDecode(text));
     }
     throw('Empty response from Vertex');
-  }
-
-  String _aiPrompt(String theme) {
-    return '''
-    Provide Monopoly board spaces for a game themed around $theme in json matching the following format without markdown annotation:
-    {
-      "groups": [
-        {
-          "color": "dark blue",
-          "hex": "#295DAB",
-          "properties": [
-            {
-              "name": "Boardwalk",
-              "rent": 450
-            }
-          ]
-        }
-      ]
-    }
-    ''';
   }
 }
