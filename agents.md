@@ -19,7 +19,8 @@ The project follows a simple, feature-based structure:
 
 - **Local State**: Use `setState` for managing local widget state (e.g., loading indicators, form validation).
 - **Data Passing**: Pass data between screens using constructor arguments.
-- **Avoid Complexity**: Do not introduce complex state management libraries (Provider, Riverpod, BLoC) unless strictly necessary for a significant feature expansion. Stick to `setState` and simple prop drilling for now.
+- **Future Features**: Incorporate `flutter_bloc` for managing complex state and business logic in new features.
+- **Avoid Complexity**: For simple features, stick to `setState` and simple prop drilling.
 
 ## 4. Routing
 
