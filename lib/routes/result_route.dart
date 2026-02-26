@@ -1,5 +1,6 @@
 import 'package:aiopoly/utils/hex_color.dart';
 import 'package:aiopoly/data/property_group.dart';
+import 'package:aiopoly/data/property.dart';
 import 'package:flutter/material.dart';
 
 class ResultRoute extends StatelessWidget {
@@ -10,61 +11,82 @@ class ResultRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> children = [];
+    
+    // Header
+    children.add(
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Center(
+          child: Text(
+            'Game Theme: $theme',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+      ),
+    );
+
+    for (var i = 0; i < propertyGroups.length; i++) {
+      var group = propertyGroups[i];
+      
+      // Add a divider between groups
+      if (i > 0) {
+        children.add(const Divider(height: 32, thickness: 1));
+      }
+
+      // Add a card for each property in the group
+      for (var property in group.properties) {
+        children.add(_propertyCard(group, property));
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Properties'),
       ),
-      body: ListView.builder(
+      body: ListView(
         padding: const EdgeInsets.all(12),
-        itemBuilder: _item,
-      )
+        children: children,
+      ),
     );
   }
 
-  Widget? _item(BuildContext ctx, int i) {
-    if (i == 0) {
-      return Center(
-        child: Text('Game Theme: $theme'),
-      );
-    }
-    i--;
-
-    if (i < propertyGroups.length) {
-      var group = propertyGroups[i];
-      return Card(
-        clipBehavior: Clip.hardEdge,
-        child: IntrinsicHeight(
-          child: Row(
-            children: [
-              Container(
-                width: 24,
-                color: HexColor.fromHex(group.colorHex),
-              ),
-              const SizedBox(
-                width: 12,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: group.properties.map((e) {
-                    return Row(
-                      children: [
-                        Text(e.name),
-                        Text(' - ${e.rent.toString()}'),
-                      ],
-                    );
-                  }).toList(),
+  Widget _propertyCard(PropertyGroup group, Property property) {
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Container(
+              width: 16,
+              color: HexColor.fromHex(group.colorHex),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      property.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: Text(
+                        'Rent: \$${property.rent}',
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-    }
-    i =- propertyGroups.length;
-
-    return null;
+      ),
+    );
   }
 }
