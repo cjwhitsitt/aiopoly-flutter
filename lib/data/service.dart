@@ -8,9 +8,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
 
-enum ServiceEndpoint {
-  firebase, direct
-}
+enum ServiceEndpoint { firebase, direct }
 
 class Service {
   static void useEmulators() {
@@ -21,23 +19,28 @@ class Service {
     }
   }
 
-  Future<List<PropertyGroup>> create(String theme, {required ServiceEndpoint endpoint}) async {
+  Future<List<PropertyGroup>> create(
+    String theme, {
+    required ServiceEndpoint endpoint,
+  }) async {
     CreateResponse? response;
     switch (endpoint) {
-      case ServiceEndpoint.firebase: {
-        response = await _makeFirebaseRequest(theme);
-      }
-      case ServiceEndpoint.direct: {
-        response = await _makeDirectRequest(theme);
-      }
+      case ServiceEndpoint.firebase:
+        {
+          response = await _makeFirebaseRequest(theme);
+        }
+      case ServiceEndpoint.direct:
+        {
+          response = await _makeDirectRequest(theme);
+        }
     }
     return response.groups;
   }
 
   Future<CreateResponse> _makeFirebaseRequest(theme) async {
-    final response = await FirebaseFunctions.instance.httpsCallable('create').call({
-      'theme': theme,
-    });
+    final response = await FirebaseFunctions.instance
+        .httpsCallable('create')
+        .call({'theme': theme});
 
     final data = response.data;
     dLog('Response:');
@@ -56,27 +59,63 @@ class Service {
         responseSchema: Schema(
           SchemaType.object,
           properties: {
-            'groups': Schema(SchemaType.array, items: Schema(
-              SchemaType.object,
-              properties: {
-                'color': Schema(SchemaType.string, description: 'Color of the property group, for example: "Dark Blue"'),
-                'hex': Schema(SchemaType.string, description: 'Hex code of the color, for example: "#295DAB"'),
-                'properties': Schema(SchemaType.array, items: Schema(
-                  SchemaType.object,
-                  properties: {
-                    'name': Schema(SchemaType.string, description: 'Name of the property, for example: "Park Place"'),
-                    'rent': Schema(SchemaType.integer, description: 'Rent price of the property, for example: 350'),
-                  },
-                )),
-              },
-            )),
+            'groups': Schema(
+              SchemaType.array,
+              items: Schema(
+                SchemaType.object,
+                properties: {
+                  'color': Schema(
+                    SchemaType.string,
+                    description:
+                        'Color of the property group, for example: "Dark Blue"',
+                  ),
+                  'hex': Schema(
+                    SchemaType.string,
+                    description:
+                        'Hex code of the color, for example: "#295DAB"',
+                  ),
+                  'properties': Schema(
+                    SchemaType.array,
+                    items: Schema(
+                      SchemaType.object,
+                      properties: {
+                        'name': Schema(
+                          SchemaType.string,
+                          description:
+                              'Name of the property, for example: "Park Place"',
+                        ),
+                        'rent': Schema(
+                          SchemaType.integer,
+                          description:
+                              'Rent price of the property, for example: 350',
+                        ),
+                        'mortgageValue': Schema(
+                          SchemaType.integer,
+                          description:
+                              'Mortgage value of the property, for example: 175',
+                        ),
+                        'payoffCost': Schema(
+                          SchemaType.integer,
+                          description:
+                              'Cost to pay off the mortgage, for example: 190',
+                        ),
+                      },
+                    ),
+                  ),
+                },
+              ),
+            ),
           },
         ),
       ),
     );
 
     // Provide a prompt that contains text
-    final prompt = [Content.text('Provide Monopoly board spaces for a game themed around $theme')];
+    final prompt = [
+      Content.text(
+        'Provide Monopoly board spaces for a game themed around $theme',
+      ),
+    ];
 
     // To generate text output, call generateContent with the text input
     final response = await model.generateContent(prompt);
@@ -87,6 +126,6 @@ class Service {
       dLog(text);
       return CreateResponse.fromJson(jsonDecode(text));
     }
-    throw('Empty response from Vertex');
+    throw ('Empty response from Vertex');
   }
 }
