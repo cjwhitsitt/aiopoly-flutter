@@ -1,6 +1,7 @@
 import 'package:aiopoly/utils/hex_color.dart';
 import 'package:aiopoly/data/property_group.dart';
 import 'package:aiopoly/data/property.dart';
+import 'package:aiopoly/data/service.dart';
 import 'package:flutter/material.dart';
 
 class ResultRoute extends StatelessWidget {
@@ -50,6 +51,16 @@ class ResultRoute extends StatelessWidget {
         title: const Text('Properties'),
       ),
       body: ListView(padding: const EdgeInsets.all(12), children: children),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => _ChanceCardDialog(theme: theme),
+          );
+        },
+        icon: const Icon(Icons.casino),
+        label: const Text('Chance'),
+      ),
     );
   }
 
@@ -208,6 +219,80 @@ class _PropertyCardState extends State<PropertyCard>
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ChanceCardDialog extends StatefulWidget {
+  final String theme;
+
+  const _ChanceCardDialog({required this.theme});
+
+  @override
+  State<_ChanceCardDialog> createState() => _ChanceCardDialogState();
+}
+
+class _ChanceCardDialogState extends State<_ChanceCardDialog> {
+  String? _chanceCardText;
+  String? _error;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchChanceCard();
+  }
+
+  Future<void> _fetchChanceCard() async {
+    try {
+      final service = Service();
+      final text = await service.generateChanceCard(widget.theme);
+      if (mounted) {
+        setState(() {
+          _chanceCardText = text;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _loading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        children: [
+          const Icon(Icons.casino, color: Colors.deepPurple),
+          const SizedBox(width: 8),
+          const Text('Chance'),
+        ],
+      ),
+      content: _loading
+          ? const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator.adaptive(),
+                SizedBox(height: 16),
+                Text('Drawing a card...'),
+              ],
+            )
+          : _error != null
+          ? Text('Error: $_error')
+          : Text(_chanceCardText ?? '', style: const TextStyle(fontSize: 16)),
+      actions: [
+        if (!_loading)
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+      ],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     );
   }
 }

@@ -128,4 +128,27 @@ class Service {
     }
     throw ('Empty response from Vertex');
   }
+
+  Future<String> generateChanceCard(String theme) async {
+    final model = FirebaseAI.googleAI().generativeModel(
+      model: 'gemini-2.5-flash-lite',
+      generationConfig: GenerationConfig(responseMimeType: 'text/plain'),
+    );
+
+    final prompt = [
+      Content.text(
+        'Generate a short, funny and creative Monopoly Chance card description based on the theme "$theme". Return only the description text.',
+      ),
+    ];
+
+    final response = await model.generateContent(prompt);
+
+    final text = response.text;
+    if (text != null) {
+      dLog('Chance Response:');
+      dLog(text);
+      return text;
+    }
+    throw ('Empty response from Vertex');
+  }
 }
