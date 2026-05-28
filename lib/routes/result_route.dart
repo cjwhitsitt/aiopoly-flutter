@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:aiopoly/utils/hex_color.dart';
 import 'package:aiopoly/data/property_group.dart';
 import 'package:aiopoly/data/property.dart';
@@ -17,8 +19,6 @@ class ResultRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [];
-
-
 
     for (var i = 0; i < propertyGroups.length; i++) {
       var group = propertyGroups[i];
@@ -114,8 +114,8 @@ class _PropertyCardState extends State<PropertyCard>
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          final angle = _controller.value * 3.1415926535897932;
-          final isBackVisible = angle > 3.1415926535897932 / 2;
+          final angle = _controller.value * pi;
+          final isBackVisible = angle > pi / 2;
 
           return Transform(
             transform: Matrix4.identity()
@@ -124,7 +124,7 @@ class _PropertyCardState extends State<PropertyCard>
             alignment: Alignment.center,
             child: isBackVisible
                 ? Transform(
-                    transform: Matrix4.identity()..rotateY(3.1415926535897932),
+                    transform: Matrix4.identity()..rotateY(pi),
                     alignment: Alignment.center,
                     child: _buildBack(),
                   )
@@ -135,16 +135,79 @@ class _PropertyCardState extends State<PropertyCard>
     );
   }
 
+  IconData _getUtilityIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('water') ||
+        lower.contains('aqueduct') ||
+        lower.contains('fluid') ||
+        lower.contains('h2o')) {
+      return Icons.water_drop;
+    }
+    if (lower.contains('electric') ||
+        lower.contains('power') ||
+        lower.contains('light') ||
+        lower.contains('energy') ||
+        lower.contains('bolt') ||
+        lower.contains('voltage')) {
+      return Icons.bolt;
+    }
+    if (lower.contains('internet') ||
+        lower.contains('wifi') ||
+        lower.contains('network') ||
+        lower.contains('data') ||
+        lower.contains('web')) {
+      return Icons.wifi;
+    }
+    if (lower.contains('gas') ||
+        lower.contains('fuel') ||
+        lower.contains('heat') ||
+        lower.contains('fire')) {
+      return Icons.local_fire_department;
+    }
+    return Icons.build;
+  }
+
   Widget _buildFront() {
+    final type = widget.group.groupType;
+    final theme = Theme.of(context);
+    Widget leadingWidget;
+
+    if (type == 'railroad') {
+      leadingWidget = Container(
+        width: 56,
+        color: theme.colorScheme.secondaryContainer,
+        child: Center(
+          child: Icon(
+            Icons.directions_railway_filled,
+            color: theme.colorScheme.onSecondaryContainer,
+            size: 28,
+          ),
+        ),
+      );
+    } else if (type == 'utility') {
+      final icon = _getUtilityIcon(widget.property.name);
+      leadingWidget = Container(
+        width: 56,
+        color: theme.colorScheme.tertiaryContainer,
+        child: Center(
+          child: Icon(
+            icon,
+            color: theme.colorScheme.onTertiaryContainer,
+            size: 28,
+          ),
+        ),
+      );
+    } else {
+      final colorHex = widget.group.colorHex ?? '#808080';
+      leadingWidget = Container(width: 16, color: HexColor.fromHex(colorHex));
+    }
+
     return Card(
       clipBehavior: Clip.hardEdge,
       child: IntrinsicHeight(
         child: Row(
           children: [
-            Container(
-              width: 16,
-              color: HexColor.fromHex(widget.group.colorHex),
-            ),
+            leadingWidget,
             const SizedBox(width: 12),
             Expanded(
               child: Padding(
@@ -186,10 +249,35 @@ class _PropertyCardState extends State<PropertyCard>
   }
 
   Widget _buildBack() {
-    final backgroundColor = HexColor.fromHex(widget.group.colorHex);
-    final textColor = backgroundColor.computeLuminance() > 0.5
-        ? Colors.black
-        : Colors.white;
+    final type = widget.group.groupType;
+    final theme = Theme.of(context);
+    final Color backgroundColor;
+    final Color textColor;
+    Widget? backIcon;
+
+    if (type == 'railroad') {
+      backgroundColor = theme.colorScheme.secondary;
+      textColor = theme.colorScheme.onSecondary;
+      backIcon = Icon(
+        Icons.directions_railway_filled,
+        size: 24,
+        color: textColor.withValues(alpha: 0.8),
+      );
+    } else if (type == 'utility') {
+      backgroundColor = theme.colorScheme.tertiary;
+      textColor = theme.colorScheme.onTertiary;
+      backIcon = Icon(
+        _getUtilityIcon(widget.property.name),
+        size: 24,
+        color: textColor.withValues(alpha: 0.8),
+      );
+    } else {
+      final colorHex = widget.group.colorHex ?? '#808080';
+      backgroundColor = HexColor.fromHex(colorHex);
+      textColor = backgroundColor.computeLuminance() > 0.5
+          ? Colors.black
+          : Colors.white;
+    }
 
     return Card(
       clipBehavior: Clip.hardEdge,
@@ -200,23 +288,37 @@ class _PropertyCardState extends State<PropertyCard>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  Text(
-                    'Mortgage: \$${widget.property.mortgageValue}',
-                    style: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'Payoff: \$${widget.property.payoffCost}',
-                    style: TextStyle(color: textColor.withAlpha(200)),
+                  if (backIcon != null) ...[
+                    backIcon,
+                    const SizedBox(width: 12),
+                  ],
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Mortgage: \$${widget.property.mortgageValue}',
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Payoff: \$${widget.property.payoffCost}',
+                        style: TextStyle(
+                          color: textColor.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              Icon(Icons.flip, size: 16, color: textColor.withAlpha(150)),
+              Icon(
+                Icons.flip,
+                size: 16,
+                color: textColor.withValues(alpha: 0.6),
+              ),
             ],
           ),
         ),

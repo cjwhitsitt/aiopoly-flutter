@@ -31,11 +31,7 @@ class _HomeRouteState extends State<HomeRoute> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Spacer(flex: 2),
-            _row([
-              const Text(
-                'Enter a theme for your game',
-              ),
-            ]),
+            _row([const Text('Enter a theme for your game')]),
             _row([
               Expanded(
                 child: TextField(
@@ -54,19 +50,22 @@ class _HomeRouteState extends State<HomeRoute> {
             // if (!_loading) _row([
             //   const Text('Choose how to submit'),
             // ]),
-            if (!_loading) _row([
-              // const Spacer(),
-              // TextButton(
-              //   onPressed: _canSubmit ? () => _submit(ServiceEndpoint.firebase) : null,
-              //   child: const Text('Via Firebase'),
-              // ),
-              const Spacer(),
-              FilledButton(
-                onPressed: _canSubmit ? () => _submit(ServiceEndpoint.direct) : null,
-                child: const Text('Generate'),
-              ),
-              const Spacer(),
-            ]),
+            if (!_loading)
+              _row([
+                // const Spacer(),
+                // TextButton(
+                //   onPressed: _canSubmit ? () => _submit(ServiceEndpoint.firebase) : null,
+                //   child: const Text('Via Firebase'),
+                // ),
+                const Spacer(),
+                FilledButton(
+                  onPressed: _canSubmit
+                      ? () => _submit(ServiceEndpoint.direct)
+                      : null,
+                  child: const Text('Generate'),
+                ),
+                const Spacer(),
+              ]),
             const Spacer(flex: 2),
           ],
         ),
@@ -90,30 +89,41 @@ class _HomeRouteState extends State<HomeRoute> {
     });
     var theme = _controller.text;
 
-    _service.create(theme, endpoint: endpoint).then((value) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return ResultRoute(theme: theme, propertyGroups: value);
-      }));
-    }).onError((error, stackTrace) {
-      if (kDebugMode) {
-        print(error);
-      }
-      showAdaptiveDialog(context: context, builder: (context) {
-        return AlertDialog.adaptive(
-          title: const Text('Error'),
-          content: Text(error.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+    _service
+        .create(theme, endpoint: endpoint)
+        .then((value) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) {
+                return ResultRoute(theme: theme, propertyGroups: value);
+              },
             ),
-          ],
-        );
-      });
-    }).whenComplete(() {
-      setState(() {
-        _loading = false;
-      });
-    });
+          );
+        })
+        .onError((error, stackTrace) {
+          if (kDebugMode) {
+            print(error);
+          }
+          showAdaptiveDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog.adaptive(
+                title: const Text('Error'),
+                content: Text(error.toString()),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        })
+        .whenComplete(() {
+          setState(() {
+            _loading = false;
+          });
+        });
   }
 }

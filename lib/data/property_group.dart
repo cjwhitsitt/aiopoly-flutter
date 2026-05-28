@@ -1,13 +1,15 @@
 import 'package:aiopoly/data/property.dart';
 
 class PropertyGroup {
-  final String colorName;
-  final String colorHex;
+  final String groupType;
+  final String? colorName;
+  final String? colorHex;
   final List<Property> properties;
 
   PropertyGroup({
-    required this.colorName,
-    required this.colorHex,
+    required this.groupType,
+    this.colorName,
+    this.colorHex,
     required this.properties,
   });
 
@@ -22,6 +24,7 @@ class PropertyGroup {
     }
 
     return PropertyGroup(
+      groupType: json['type'] ?? 'color',
       colorName: json['color'],
       colorHex: json['hex'],
       properties: properties,

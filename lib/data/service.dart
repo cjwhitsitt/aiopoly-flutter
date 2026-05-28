@@ -64,15 +64,23 @@ class Service {
               items: Schema(
                 SchemaType.object,
                 properties: {
+                  'type': Schema(
+                    SchemaType.string,
+                    description:
+                        'Type of the property group. MUST be one of: "color" (for standard street or landmark property groups), "railroad" (for transportation or travel properties that do not have a color, e.g. stations, airports, space gates), or "utility" (for services or infrastructure properties that do not have a color, e.g. power grid, waterworks, wifi network).',
+                    enumValues: [
+                      'color', 'railroad', 'utility',
+                    ],
+                  ),
                   'color': Schema(
                     SchemaType.string,
                     description:
-                        'Color of the property group, for example: "Dark Blue"',
+                        'Color of the property group, for example: "Dark Blue". Required if type is "color", omit or leave null otherwise.',
                   ),
                   'hex': Schema(
                     SchemaType.string,
                     description:
-                        'Hex code of the color, for example: "#295DAB"',
+                        'Hex code of the color, for example: "#295DAB". Required if type is "color", omit or leave null otherwise.',
                   ),
                   'properties': Schema(
                     SchemaType.array,
@@ -113,7 +121,11 @@ class Service {
     // Provide a prompt that contains text
     final prompt = [
       Content.text(
-        'Provide Monopoly board spaces for a game themed around $theme',
+        'Provide Monopoly board spaces for a game themed around "$theme".\n'
+        'You must generate a variety of property groups. Most groups should be standard street or landmark property groups (type "color") that consist of 2-3 properties and a shared color hex. '
+        'You should also include one transport/travel group (type "railroad" - typically 4 properties like depots, hubs, or stations themed around the topic) '
+        'and/or one service/infrastructure group (type "utility" - typically 2 properties themed around the topic, e.g., energy grid, water recycling, or satellite comms). '
+        'For railroad and utility groups, do not provide color or hex values.',
       ),
     ];
 
