@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:aiopoly/utils/constants.dart';
 import 'package:aiopoly/data/create_response.dart';
-import 'package:aiopoly/data/property_group.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
@@ -19,7 +18,7 @@ class Service {
     }
   }
 
-  Future<List<PropertyGroup>> create(
+  Future<CreateResponse> create(
     String theme, {
     required ServiceEndpoint endpoint,
   }) async {
@@ -34,7 +33,7 @@ class Service {
           response = await _makeDirectRequest(theme);
         }
     }
-    return response.groups;
+    return response;
   }
 
   Future<CreateResponse> _makeFirebaseRequest(theme) async {
@@ -68,9 +67,7 @@ class Service {
                     SchemaType.string,
                     description:
                         'Type of the property group. MUST be one of: "color" (for standard street or landmark property groups), "railroad" (for transportation or travel properties that do not have a color, e.g. stations, airports, space gates), or "utility" (for services or infrastructure properties that do not have a color, e.g. power grid, waterworks, wifi network).',
-                    enumValues: [
-                      'color', 'railroad', 'utility',
-                    ],
+                    enumValues: ['color', 'railroad', 'utility'],
                   ),
                   'color': Schema(
                     SchemaType.string,
@@ -113,6 +110,31 @@ class Service {
                 },
               ),
             ),
+            'tokens': Schema(
+              SchemaType.array,
+              description:
+                  'List of thematic player tokens for the game. Generate exactly 4 tokens.',
+              items: Schema(
+                SchemaType.object,
+                properties: {
+                  'name': Schema(
+                    SchemaType.string,
+                    description:
+                        'Name of the player token, e.g. "Warp Gate Key", "Spaceman"',
+                  ),
+                  'description': Schema(
+                    SchemaType.string,
+                    description:
+                        'Funny or flavor description for the token, explaining why it is in the game.',
+                  ),
+                  'iconName': Schema(
+                    SchemaType.string,
+                    description:
+                        'The material/font icon name that best represents the token (e.g. rocket_launch, anchor, pets, directions_car, sailing, flight, local_pizza, support, crown, star, shield, key, face, work). Use lowercase, matching standard material icons.',
+                  ),
+                },
+              ),
+            ),
           },
         ),
       ),
@@ -121,11 +143,12 @@ class Service {
     // Provide a prompt that contains text
     final prompt = [
       Content.text(
-        'Provide Monopoly board spaces for a game themed around "$theme".\n'
-        'You must generate a variety of property groups. Most groups should be standard street or landmark property groups (type "color") that consist of 2-3 properties and a shared color hex. '
+        'Provide Monopoly board spaces and player tokens for a game themed around "$theme".\n'
+        '1. You must generate a variety of property groups. Most groups should be standard street or landmark property groups (type "color") that consist of 2-3 properties and a shared color hex. '
         'You should also include one transport/travel group (type "railroad" - typically 4 properties like depots, hubs, or stations themed around the topic) '
         'and/or one service/infrastructure group (type "utility" - typically 2 properties themed around the topic, e.g., energy grid, water recycling, or satellite comms). '
-        'For railroad and utility groups, do not provide color or hex values.',
+        'For railroad and utility groups, do not provide color or hex values.\n'
+        '2. You must also generate exactly 4 player tokens representing thematic playing pieces (like custom objects, characters, or items relevant to the theme), each with a name, funny description, and a matching iconName.',
       ),
     ];
 
@@ -179,7 +202,7 @@ class Service {
         '    ]\n'
         '  }\n'
         '}\n'
-        'Choose either "Row" or "Column" for the "layout" component to best fit the content. Return ONLY the JSON object.'
+        'Choose either "Row" or "Column" for the "layout" component to best fit the content. Return ONLY the JSON object.',
       ),
     ];
 

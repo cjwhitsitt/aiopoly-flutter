@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:aiopoly/data/player_token.dart';
 import 'package:aiopoly/data/property.dart';
 import 'package:aiopoly/data/property_group.dart';
 import 'package:aiopoly/data/service.dart';
@@ -12,16 +13,22 @@ import 'package:genui/genui.dart';
 class ResultRoute extends StatelessWidget {
   final String theme;
   final List<PropertyGroup> propertyGroups;
+  final List<PlayerToken> tokens;
 
   const ResultRoute({
     super.key,
     required this.theme,
     required this.propertyGroups,
+    required this.tokens,
   });
 
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [];
+
+    if (tokens.isNotEmpty) {
+      // TODO: Add tokens
+    }
 
     for (var i = 0; i < propertyGroups.length; i++) {
       var group = propertyGroups[i];
@@ -179,16 +186,19 @@ class _ChanceCardDialogState extends State<_ChanceCardDialog> {
       final service = Service();
       final text = await service.generateChanceCard(widget.theme);
       if (mounted) {
-        _controller.handleMessage(A2uiMessage.fromJson({
-          'version': 'v0.9',
-          'createSurface': {
-            'surfaceId': 'chance_card',
-            'catalogId': 'https://a2ui.org/specification/v0_9/basic_catalog.json',
-          },
-        }));
-        _controller.handleMessage(A2uiMessage.fromJson(
-          jsonDecode(text) as Map<String, dynamic>,
-        ));
+        _controller.handleMessage(
+          A2uiMessage.fromJson({
+            'version': 'v0.9',
+            'createSurface': {
+              'surfaceId': 'chance_card',
+              'catalogId':
+                  'https://a2ui.org/specification/v0_9/basic_catalog.json',
+            },
+          }),
+        );
+        _controller.handleMessage(
+          A2uiMessage.fromJson(jsonDecode(text) as Map<String, dynamic>),
+        );
         setState(() {
           _loading = false;
         });

@@ -95,7 +95,11 @@ class _HomeRouteState extends State<HomeRoute> {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) {
-                return ResultRoute(theme: theme, propertyGroups: value);
+                return ResultRoute(
+                  theme: theme,
+                  propertyGroups: value.groups,
+                  tokens: value.tokens,
+                );
               },
             ),
           );
