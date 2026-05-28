@@ -50,7 +50,15 @@ class ResultRoute extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Properties'),
       ),
-      body: ListView(padding: const EdgeInsets.all(12), children: children),
+      body: ListView(
+        padding: const EdgeInsets.only(
+          left: 12,
+          right: 12,
+          top: 12,
+          bottom: 100,
+        ),
+        children: children,
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           showDialog(
