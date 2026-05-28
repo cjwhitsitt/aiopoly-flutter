@@ -51,19 +51,19 @@ class _HomeRouteState extends State<HomeRoute> {
             ]),
             const Spacer(),
             if (_loading) _row([const CircularProgressIndicator.adaptive()]),
+            // if (!_loading) _row([
+            //   const Text('Choose how to submit'),
+            // ]),
             if (!_loading) _row([
-              const Text('Choose how to submit'),
-            ]),
-            if (!_loading) _row([
+              // const Spacer(),
+              // TextButton(
+              //   onPressed: _canSubmit ? () => _submit(ServiceEndpoint.firebase) : null,
+              //   child: const Text('Via Firebase'),
+              // ),
               const Spacer(),
-              TextButton(
-                onPressed: _canSubmit ? () => _submit(ServiceEndpoint.firebase) : null,
-                child: const Text('Via Firebase'),
-              ),
-              const Spacer(),
-              TextButton(
+              FilledButton(
                 onPressed: _canSubmit ? () => _submit(ServiceEndpoint.direct) : null,
-                child: const Text('Direct'),
+                child: const Text('Generate'),
               ),
               const Spacer(),
             ]),
