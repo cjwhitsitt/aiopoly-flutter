@@ -1,12 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
-
-import 'package:flutter/material.dart';
 
 import 'package:aiopoly/data/property.dart';
 import 'package:aiopoly/data/property_group.dart';
 import 'package:aiopoly/data/service.dart';
 import 'package:aiopoly/ui/property_card_back.dart';
 import 'package:aiopoly/ui/property_card_front.dart';
+import 'package:flutter/material.dart';
+import 'package:genui/genui.dart';
 
 class ResultRoute extends StatelessWidget {
   final String theme;
@@ -154,14 +155,23 @@ class _ChanceCardDialog extends StatefulWidget {
 }
 
 class _ChanceCardDialogState extends State<_ChanceCardDialog> {
-  String? _chanceCardText;
+  late final SurfaceController _controller;
+  late final SurfaceContext _surfaceContext;
   String? _error;
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
+    _controller = SurfaceController(catalogs: [BasicCatalogItems.asCatalog()]);
+    _surfaceContext = _controller.contextFor('chance_card');
     _fetchChanceCard();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchChanceCard() async {
@@ -169,8 +179,17 @@ class _ChanceCardDialogState extends State<_ChanceCardDialog> {
       final service = Service();
       final text = await service.generateChanceCard(widget.theme);
       if (mounted) {
+        _controller.handleMessage(A2uiMessage.fromJson({
+          'version': 'v0.9',
+          'createSurface': {
+            'surfaceId': 'chance_card',
+            'catalogId': 'https://a2ui.org/specification/v0_9/basic_catalog.json',
+          },
+        }));
+        _controller.handleMessage(A2uiMessage.fromJson(
+          jsonDecode(text) as Map<String, dynamic>,
+        ));
         setState(() {
-          _chanceCardText = text;
           _loading = false;
         });
       }
@@ -205,7 +224,7 @@ class _ChanceCardDialogState extends State<_ChanceCardDialog> {
             )
           : _error != null
           ? Text('Error: $_error')
-          : Text(_chanceCardText ?? '', style: const TextStyle(fontSize: 16)),
+          : Surface(surfaceContext: _surfaceContext),
       actions: [
         if (!_loading)
           TextButton(

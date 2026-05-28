@@ -53,7 +53,7 @@ class Service {
     // Initialize the Gemini Developer API backend service
     // Create a `GenerativeModel` instance with a model that supports your use case
     final model = FirebaseAI.googleAI().generativeModel(
-      model: 'gemini-2.5-flash-lite',
+      model: 'gemini-3.1-flash-lite',
       generationConfig: GenerationConfig(
         responseMimeType: 'application/json',
         responseSchema: Schema(
@@ -143,13 +143,43 @@ class Service {
 
   Future<String> generateChanceCard(String theme) async {
     final model = FirebaseAI.googleAI().generativeModel(
-      model: 'gemini-2.5-flash-lite',
-      generationConfig: GenerationConfig(responseMimeType: 'text/plain'),
+      model: 'gemini-3.1-flash-lite',
+      generationConfig: GenerationConfig(responseMimeType: 'application/json'),
     );
 
     final prompt = [
       Content.text(
-        'Generate a short, funny and creative Monopoly Chance card description based on the theme "$theme". Return only the description text.',
+        'Generate a short, funny and creative Monopoly Chance card description based on the theme "$theme".\n'
+        'You must return a valid A2UI JSON payload matching this exact schema:\n'
+        '{\n'
+        '  "version": "v0.9",\n'
+        '  "updateComponents": {\n'
+        '    "surfaceId": "chance_card",\n'
+        '    "components": [\n'
+        '      {\n'
+        '        "id": "root",\n'
+        '        "component": "Card",\n'
+        '        "child": "layout"\n'
+        '      },\n'
+        '      {\n'
+        '        "id": "layout",\n'
+        '        "component": "Row",\n'
+        '        "children": ["icon", "text"]\n'
+        '      },\n'
+        '      {\n'
+        '        "id": "icon",\n'
+        '        "component": "Icon",\n'
+        '        "name": "<select one appropriate icon from: warning, payment, error, info, locationOn, help, star, calendarToday, check, delete, notifications, edit, shoppingCart>"\n'
+        '      },\n'
+        '      {\n'
+        '        "id": "text",\n'
+        '        "component": "Text",\n'
+        '        "text": "<the funny chance card text>"\n'
+        '      }\n'
+        '    ]\n'
+        '  }\n'
+        '}\n'
+        'Choose either "Row" or "Column" for the "layout" component to best fit the content. Return ONLY the JSON object.'
       ),
     ];
 
