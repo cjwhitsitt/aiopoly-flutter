@@ -7,6 +7,7 @@ import 'package:aiopoly/data/property_group.dart';
 import 'package:aiopoly/data/service.dart';
 import 'package:aiopoly/ui/property_card_back.dart';
 import 'package:aiopoly/ui/property_card_front.dart';
+import 'package:aiopoly/ui/token_piece_card.dart';
 import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
 
@@ -27,7 +28,29 @@ class ResultRoute extends StatelessWidget {
     List<Widget> children = [];
 
     if (tokens.isNotEmpty) {
-      // TODO: Add tokens
+      children.addAll([
+        Text(
+          'Player Tokens',
+          style: Theme.of(context)
+              .textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: tokens
+                .map(
+                    (token) => Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: SizedBox(
+                    width: 280,
+                    child: TokenPieceCard(token: token),
+                  ),
+                )).toList(),
+          ),
+        ),
+        const Divider(height: 32, thickness: 1),
+      ]);
     }
 
     for (var i = 0; i < propertyGroups.length; i++) {
