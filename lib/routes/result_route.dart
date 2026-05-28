@@ -18,18 +18,7 @@ class ResultRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> children = [];
 
-    // Header
-    children.add(
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Center(
-          child: Text(
-            'Game Theme: $theme',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-        ),
-      ),
-    );
+
 
     for (var i = 0; i < propertyGroups.length; i++) {
       var group = propertyGroups[i];
@@ -48,7 +37,7 @@ class ResultRoute extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Properties'),
+        title: Text('Theme: $theme'),
       ),
       body: ListView(
         padding: const EdgeInsets.only(
